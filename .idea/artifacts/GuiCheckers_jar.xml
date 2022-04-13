@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="GuiCheckers:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/GuiCheckers_jar</output-path>
+    <root id="archive" name="GuiCheckers.jar">
+      <element id="module-output" name="GuiCheckers" />
+      <element id="dir-copy" path="$PROJECT_DIR$/resources" />
+      <element id="file-copy" path="$PROJECT_DIR$/resources/Untitled.png" />
+    </root>
+  </artifact>
+</component>
