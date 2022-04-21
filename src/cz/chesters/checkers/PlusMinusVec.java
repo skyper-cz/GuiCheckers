@@ -43,9 +43,11 @@ public class PlusMinusVec {
         System.out.println("did a klik");
         if (e.getSource() == plus) {
             cislo++;
-        }  if (e.getSource() == minus) {
+        }
+        if (e.getSource() == minus) {
             cislo--;
-        }  if (e.getSource() == wack) {
+        }
+        if (e.getSource() == wack) {
 
             System.out.println("did a do");
             if (isWackMoved) {
