@@ -1,5 +1,7 @@
 package cz.chesters.checkers;
 
+import cz.chesters.checkers.buttonVec.ButtonVec;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Locale;
