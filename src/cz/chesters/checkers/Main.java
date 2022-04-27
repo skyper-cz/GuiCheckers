@@ -31,7 +31,8 @@ public class Main {
             }
         } else {
             Calculator calc = new Calculator();
-            calc.doShit();
+            ButtonVec btnvec = new ButtonVec();
+            btnvec.doStuff();
         }
 
     }
