@@ -1,4 +1,4 @@
-package cz.chesters.checkers;
+package cz.chesters.checkers.cringe;
 
 import javax.swing.*;
 import java.awt.*;

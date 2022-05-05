@@ -1,6 +1,8 @@
 package cz.chesters.checkers;
 
 import cz.chesters.checkers.buttonVec.ButtonVec;
+import cz.chesters.checkers.cringe.Calculator;
+import cz.chesters.checkers.cringe.PlusMinusVec;
 
 import javax.swing.*;
 import java.awt.*;
