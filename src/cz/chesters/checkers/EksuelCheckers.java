@@ -37,4 +37,24 @@ public class EksuelCheckers {
         System.out.println("y = " + y);
     }
 
+    public void initializeCells() {
+        int x = 0;
+        int y = 0;
+
+        // Lord, have mercy.
+        for (Cell[] row : cellField) {
+            x = 0;
+            for (Cell cl : row) {
+                if (((x % 2) + (y % 2)) % 2 == 1) {
+                    if (y < 3)
+                        cl = new Cell(true, true);
+                    else if (y > 4)
+                        cl = new Cell(true, true);
+                    else cl = new Cell(true);
+                } else cl = new Cell(false);
+                x++;
+            }
+            y++;
+        }
+    }
 }
