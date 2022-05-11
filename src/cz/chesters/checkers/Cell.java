@@ -19,7 +19,6 @@ public class Cell {
 
         if (!isBlack && !isNull(piece))
             System.out.println(Mik.BG_YELLOW + Mik.BLACK + "WARN:" + Mik.RESET + Mik.YELLOW + " Vytvořena bílá buňka s figurkou!" + Mik.RESET);
-
     }
 
     public Cell(boolean isBlack, boolean isPieceBlack) {
@@ -28,7 +27,6 @@ public class Cell {
 
         if (!isBlack)
             System.out.println(Mik.BG_YELLOW + Mik.BLACK + "WARN:" + Mik.RESET + Mik.YELLOW + " Vytvořena bílá buňka s figurkou!" + Mik.RESET);
-
     }
 
     public Cell(boolean isBlack, boolean isPieceBlack, boolean isPieceQueen) {
@@ -37,7 +35,6 @@ public class Cell {
 
         if (!isBlack)
             System.out.println(Mik.BG_YELLOW + Mik.BLACK + "WARN:" + Mik.RESET + Mik.YELLOW + " Vytvořena bílá buňka s figurkou!" + Mik.RESET);
-
     }
 
 
