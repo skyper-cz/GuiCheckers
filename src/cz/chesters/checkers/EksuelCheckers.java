@@ -1,8 +1,9 @@
 package cz.chesters.checkers;
 
-import cz.chesters.checkers.buttonVec.Button;
-
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+
+import static java.util.Objects.isNull;
 
 public class EksuelCheckers {
     JFrame frame = new JFrame("Checkers");
@@ -10,51 +11,116 @@ public class EksuelCheckers {
     JButton[][] buttonField = new JButton[8][8];
 
     public void play() {
-        frame.setSize(880, 880);
+        System.out.println("Started checkers.");
+        frame.setSize(860, 885);
         frame.setVisible(true);
         frame.setLayout(null);
         frame.setResizable(false);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         initializeButtons();
 
         initializeCells();
+
+        System.out.println("Game ready!");
+        render();
     }
 
     public void initializeButtons() {
+        System.out.println("Initializing buttons...");
         int x = 5;
         int y = 5;
 
-        for (JButton[] row : buttonField) {
+        for (int ix = 0; ix < buttonField.length; ix++) {
             x = 5;
-            for (JButton btn : row) {
-                frame.add(btn);
-                btn.setBounds(x, y, 100, 100);
+            for (int iy = 0; iy < buttonField[ix].length; iy++) {
+                buttonField[ix][iy] = new JButton();
+                buttonField[ix][iy].setBounds(x, y, 100, 100);
+                frame.add(buttonField[ix][iy]);
+                buttonField[ix][iy].setVisible(true);
+                buttonField[ix][iy].addActionListener(this::click);
                 x = x + 105;
             }
             System.out.println("x = " + x);
             y = y + 105;
         }
         System.out.println("y = " + y);
+        System.out.println("Done!");
     }
 
     public void initializeCells() {
+        System.out.println("Initializing cells...");
         int x = 0;
         int y = 0;
 
         // Lord, have mercy.
-        for (Cell[] row : cellField) {
+        for (int ix = 0; ix < cellField.length; ix++) {
             x = 0;
-            for (Cell cl : row) {
+            for (int iy = 0; iy < cellField[ix].length; iy++) {
                 if (((x % 2) + (y % 2)) % 2 == 1) {
                     if (y < 3)
-                        cl = new Cell(true, true);
+                        cellField[ix][iy] = new Cell(true, true);
                     else if (y > 4)
-                        cl = new Cell(true, true);
-                    else cl = new Cell(true);
-                } else cl = new Cell(false);
+                        cellField[ix][iy] = new Cell(true, false);
+                    else cellField[ix][iy] = new Cell(true);
+                } else cellField[ix][iy] = new Cell(false);
                 x++;
             }
             y++;
         }
+        System.out.println("Done!");
+    }
+
+    public void click(ActionEvent e) {
+
+    }
+
+    public void render() {
+        System.out.println("Rendering...");
+
+        for (int x = 0; x < cellField.length; x++) {
+            for (int y = 0; y < cellField[x].length; y++) {
+                if (!cellField[x][y].isBlack) {
+                    buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white.png"));
+                } else if (isNull(cellField[x][y].piece)) {
+                    if (cellField[x][y].isSelected) {
+                        buttonField[x][y].setIcon(new ImageIcon("resources/checkers/blank highlighted.png"));
+                    } else {
+                        buttonField[x][y].setIcon(new ImageIcon("resources/checkers/blank.png"));
+                    }
+                } else if (cellField[x][y].piece.isBlack) {
+                    if (cellField[x][y].piece.isDama) {
+                        if (cellField[x][y].isSelected) {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black double checker highlighted.png"));
+                        } else {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black double checker.png"));
+                        }
+                    } else {
+                        if (cellField[x][y].isSelected) {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black checker highlighted.png"));
+                        } else {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black checker.png"));
+                        }
+                    }
+                } else {
+                    if (cellField[x][y].piece.isDama) {
+                        if (cellField[x][y].isSelected) {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white double checker highlighted.png"));
+                        } else {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white double checker.png"));
+                        }
+                    } else {
+                        if (cellField[x][y].isSelected) {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white checker highlighted.png"));
+                        } else {
+                            buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white checker.png"));
+                        }
+                    }
+                }
+            }
+
+        }
+
+        System.out.println("Done!");
     }
 }
