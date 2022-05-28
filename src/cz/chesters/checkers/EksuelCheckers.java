@@ -9,6 +9,10 @@ public class EksuelCheckers {
     JFrame frame = new JFrame("Checkers");
     Cell[][] cellField = new Cell[8][8];
     JButton[][] buttonField = new JButton[8][8];
+    boolean isSelected = false;
+    int xSelected = -1;
+    int ySelected = -1;
+    boolean isBlacksTurn = false;
 
     public void play() {
         System.out.println("Started checkers.");
@@ -72,8 +76,84 @@ public class EksuelCheckers {
     }
 
     public void click(ActionEvent e) {
+        for (int x = 0; x < buttonField.length; x++) {
+            for (int y = 0; y < buttonField[x].length; y++) {
+                if (e.getSource() == buttonField[x][y]) {
+                    System.out.println("button " + x + " " + y + " has been clicked");
+                    if (this.isSelected) {
+                        System.out.println("Something has already been selected...");
+                        if (!cellField[x][y].isSelected) {
+                            System.out.println("This tile is not selected.");
+                        } else {
+                            // TODO: Game logic
+                        }
 
+                        deselectAll();
+                        this.isSelected = false;
+                        render();
+                    }
+
+                    // klikáme na věc poprvé, nic zatim neni selected
+                    else {
+                        if (cellField[x][y].isBlack) {
+                            cellField[x][y].isSelected = true;
+                            this.isSelected = true;
+                        } else if (!isNull(cellField[x][y].piece)) {
+                            if (cellField[x][y].piece.isDama) {
+
+                                // tady se pro kazdou polaritu pojede až na okraj šachovnice a budou se označovat
+                                // všechny tily a bude jim přiřazenej příslušnej SelectReason
+                                for (int yPol = -1; yPol < 2; yPol = yPol + 2) {
+                                    for (int xPol = -1; xPol < 2; xPol = xPol + 2) {
+                                        try {
+                                            for (int i = 1; i < 8; i++) {
+                                                if (isNull(this.cellField[y + i * yPol][x + i * xPol].piece)) {
+                                                    this.cellField[y + i * yPol][x + i * xPol].select(true, Cell.Reason.MOVE);
+                                                } else if (this.cellField[y + i * yPol][x + i * xPol].piece.isBlack != this.cellField[y][x].piece.isBlack) {
+                                                    if (isNull(this.cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].piece)) {
+                                                        this.cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].select(true, Cell.Reason.JUMP);
+                                                        break;
+                                                    }
+                                                } else {
+                                                    break;
+                                                }
+                                            }
+                                        } catch (Exception ignored) {
+                                        }
+                                    }
+                                }
+                            }
+                            // figurka neni dáma
+                            else {
+
+                            }
+                        }
+                        xSelected = x;
+                        ySelected = y;
+                        render();
+                    }
+
+                }
+            }
+        }
     }
+
+    public void deselectAll() {
+        for (int x = 0; x < cellField.length; x++) {
+            for (int y = 0; y < cellField[x].length; y++) {
+                cellField[x][y].isSelected = false;
+            }
+        }
+    }
+
+    public void select(int x, int y) {
+        this.cellField[x][y].isSelected = true;
+    }
+
+    public void deselect(int x, int y) {
+        this.cellField[x][y].isSelected = false;
+    }
+
 
     public void render() {
         System.out.println("Rendering...");
