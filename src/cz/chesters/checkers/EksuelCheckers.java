@@ -84,33 +84,65 @@ public class EksuelCheckers {
                         System.out.println("Something has already been selected...");
                         if (!cellField[x][y].isSelected) {
                             System.out.println("This tile is not selected.");
+                            this.isSelected = false;
                         } else {
-                            // TODO: Game logic
+                            switch (cellField[x][y].selectReason) {
+                                default:
+                                    this.isSelected = false;
+                                    break;
+                                case JUMP:
+                                    if (x > this.xSelected) {
+                                        if (y > this.ySelected) {
+                                            this.cellField[x - 1][y - 1].piece = null;
+                                        } else if (y < this.ySelected) {
+                                            this.cellField[x - 1][y + 1].piece = null;
+                                        }
+                                    } else if (x < this.xSelected) {
+                                        if (y > this.ySelected) {
+                                            this.cellField[x + 1][y - 1].piece = null;
+                                        } else if (y < this.ySelected) {
+                                            this.cellField[x + 1][y + 1].piece = null;
+                                        }
+                                    }
+                                case MOVE:
+                                    cellField[x][y].piece = cellField[xSelected][ySelected].piece;
+                                    cellField[xSelected][ySelected].piece = null;
+                                    this.isSelected = false;
+                                    isBlacksTurn = !cellField[x][y].piece.isBlack;
+                                    if ((x == 0 && !cellField[x][y].piece.isBlack) || (x == 7 && cellField[x][y].piece.isBlack)) {
+                                        cellField[x][y].piece.promote();
+                                    }
+
+                                    break;
+                            }
                         }
 
                         deselectAll();
-                        this.isSelected = false;
                         render();
                     }
 
                     // klikáme na věc poprvé, nic zatim neni selected
                     else {
-                        if (cellField[x][y].isBlack) {
-                            cellField[x][y].isSelected = true;
-                            this.isSelected = true;
-                        } else if (!isNull(cellField[x][y].piece)) {
-                            if (cellField[x][y].piece.isDama) {
+                        System.out.println("Nothing selected yet");
 
+                        if (cellField[x][y].isBlack) {
+                            cellField[x][y].select(true, Cell.Reason.NONE);
+                            this.isSelected = true;
+                        }
+                        if (!isNull(cellField[x][y].piece)) {
+                            System.out.println("Clicked cell has a non-null piece on it");
+                            if (cellField[x][y].piece.isDama) {
+                                System.out.println("Piece is a queen");
                                 // tady se pro kazdou polaritu pojede až na okraj šachovnice a budou se označovat
                                 // všechny tily a bude jim přiřazenej příslušnej SelectReason
                                 for (int yPol = -1; yPol < 2; yPol = yPol + 2) {
                                     for (int xPol = -1; xPol < 2; xPol = xPol + 2) {
                                         try {
                                             for (int i = 1; i < 8; i++) {
-                                                if (isNull(this.cellField[y + i * yPol][x + i * xPol].piece)) {
-                                                    this.cellField[y + i * yPol][x + i * xPol].select(true, Cell.Reason.MOVE);
-                                                } else if (this.cellField[y + i * yPol][x + i * xPol].piece.isBlack != this.cellField[y][x].piece.isBlack) {
-                                                    if (isNull(this.cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].piece)) {
+                                                if (isNull(cellField[y + i * yPol][x + i * xPol].piece)) {
+                                                    cellField[y + i * yPol][x + i * xPol].select(true, Cell.Reason.MOVE);
+                                                } else if (cellField[y + i * yPol][x + i * xPol].piece.isBlack != cellField[y][x].piece.isBlack) {
+                                                    if (isNull(cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].piece)) {
                                                         this.cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].select(true, Cell.Reason.JUMP);
                                                         break;
                                                     }
@@ -122,12 +154,93 @@ public class EksuelCheckers {
                                         }
                                     }
                                 }
-                            }
-                            // figurka neni dáma
-                            else {
+                            } else {
+                                System.out.println("Clicked piece is not a queen");
+                                if (cellField[x][y].piece.isBlack) {
+                                    System.out.println("Clicked piece is black");
 
+                                    try {
+                                        if (!isNull(cellField[x + 1][y - 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y - 1].piece.isBlack) {
+                                                cellField[x + 2][y - 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        } else cellField[x + 1][y - 1].select(true, Cell.Reason.MOVE);
+                                    } catch (Exception ignored) {
+                                    }
+
+                                    try {
+                                        if (!isNull(cellField[x - 1][y - 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y - 1].piece.isBlack) {
+                                                cellField[x - 2][y - 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        }
+                                    } catch (Exception ignored) {
+                                    }
+
+                                    try {
+
+                                        if (!isNull(cellField[x + 1][y + 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y + 1].piece.isBlack) {
+                                                cellField[x + 2][y + 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        } else cellField[x + 1][y + 1].select(true, Cell.Reason.MOVE);
+                                    } catch (Exception ignored) {
+                                    }
+
+                                    try {
+                                        if (!isNull(cellField[x - 1][y + 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y + 1].piece.isBlack) {
+                                                cellField[x - 2][y + 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        }
+                                    } catch (Exception ignored) {
+                                    }
+
+                                }
+
+                                // figurka je bílá
+                                else {
+                                    System.out.println("Clicked piece is white");
+                                    try {
+                                        if (!isNull(cellField[x + 1][y - 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y - 1].piece.isBlack) {
+                                                cellField[x + 2][y - 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        }
+                                    } catch (Exception ignored) {
+                                    }
+
+                                    try {
+                                        if (!isNull(cellField[x - 1][y - 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y - 1].piece.isBlack) {
+                                                cellField[x - 2][y - 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        } else cellField[x - 1][y - 1].select(true, Cell.Reason.MOVE);
+                                    } catch (Exception ignored) {
+                                    }
+
+                                    try {
+                                        if (!isNull(cellField[x + 1][y + 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y + 1].piece.isBlack) {
+                                                cellField[x + 2][y + 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        }
+                                    } catch (Exception ignored) {
+                                    }
+
+                                    try {
+                                        if (!isNull(cellField[x - 1][y + 1].piece)) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y + 1].piece.isBlack) {
+                                                cellField[x - 2][y + 2].select(true, Cell.Reason.JUMP);
+                                            }
+                                        } else cellField[x - 1][y + 1].select(true, Cell.Reason.MOVE);
+                                    } catch (Exception ignored) {
+                                    }
+
+
+                                }
                             }
-                        }
+                        } else System.out.println("Clicked tile has a null piece.");
                         xSelected = x;
                         ySelected = y;
                         render();
@@ -150,6 +263,7 @@ public class EksuelCheckers {
         this.cellField[x][y].isSelected = true;
     }
 
+
     public void deselect(int x, int y) {
         this.cellField[x][y].isSelected = false;
     }
@@ -162,43 +276,54 @@ public class EksuelCheckers {
             for (int y = 0; y < cellField[x].length; y++) {
                 if (!cellField[x][y].isBlack) {
                     buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white.png"));
+                    System.out.print("WWW ");
                 } else if (isNull(cellField[x][y].piece)) {
                     if (cellField[x][y].isSelected) {
                         buttonField[x][y].setIcon(new ImageIcon("resources/checkers/blank highlighted.png"));
+                        System.out.print("XXH ");
                     } else {
                         buttonField[x][y].setIcon(new ImageIcon("resources/checkers/blank.png"));
+                        System.out.print("XXX ");
                     }
                 } else if (cellField[x][y].piece.isBlack) {
                     if (cellField[x][y].piece.isDama) {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black double checker highlighted.png"));
+                            System.out.print("BDH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black double checker.png"));
+                            System.out.print("BDX ");
                         }
                     } else {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black checker highlighted.png"));
+                            System.out.print("BCH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black checker.png"));
+                            System.out.print("BCX ");
                         }
                     }
                 } else {
                     if (cellField[x][y].piece.isDama) {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white double checker highlighted.png"));
+                            System.out.print("WDH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white double checker.png"));
+                            System.out.print("WDX ");
                         }
                     } else {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white checker highlighted.png"));
+                            System.out.print("WCH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white checker.png"));
+                            System.out.print("WCX ");
                         }
                     }
                 }
             }
-
+            System.out.println("");
         }
 
         System.out.println("Done!");
