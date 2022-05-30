@@ -1,6 +1,7 @@
 package cz.chesters.checkers;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 import static java.util.Objects.isNull;
@@ -13,10 +14,15 @@ public class EksuelCheckers {
     int xSelected = -1;
     int ySelected = -1;
     boolean isBlacksTurn = false;
+    JButton playAgain = new JButton("Play again");
+    JButton quit = new JButton("Quit");
+    JLabel blackWon = new JLabel(new ImageIcon("resources/checkers/Victory screens/black wins.png"));
+    JLabel whiteWon = new JLabel(new ImageIcon("resources/checkers/Victory screens/white wins.png"));
+    JLabel turnDisplay = new JLabel("It should be white's turn");
 
     public void play() {
         System.out.println("Started checkers.");
-        frame.setSize(860, 885);
+        frame.setSize(860, 935);
         frame.setVisible(true);
         frame.setLayout(null);
         frame.setResizable(false);
@@ -32,8 +38,8 @@ public class EksuelCheckers {
 
     public void initializeButtons() {
         System.out.println("Initializing buttons...");
-        int x = 5;
-        int y = 5;
+        int x;
+        int y = 55;
 
         for (int ix = 0; ix < buttonField.length; ix++) {
             x = 5;
@@ -49,6 +55,28 @@ public class EksuelCheckers {
             y = y + 105;
         }
         System.out.println("y = " + y);
+
+        blackWon.setBounds(23, 81, 800, 664);
+        whiteWon.setBounds(23, 81, 800, 664);
+        frame.add(blackWon);
+        frame.add(whiteWon);
+        blackWon.setVisible(false);
+        whiteWon.setVisible(false);
+
+        quit.setBounds(176, 782, 240, 70);
+        playAgain.setBounds(444, 782, 240, 70);
+        frame.add(quit);
+        frame.add(playAgain);
+        quit.setVisible(false);
+        playAgain.setVisible(false);
+        quit.addActionListener(this::click);
+        playAgain.addActionListener(this::click);
+
+        turnDisplay.setBounds(245, 5, 355, 40);
+        frame.add(turnDisplay);
+        turnDisplay.setVisible(true);
+        turnDisplay.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
+
         System.out.println("Done!");
     }
 
@@ -90,6 +118,7 @@ public class EksuelCheckers {
                                 default:
                                     this.isSelected = false;
                                     break;
+
                                 case JUMP:
                                     if (x > this.xSelected) {
                                         if (y > this.ySelected) {
@@ -112,7 +141,6 @@ public class EksuelCheckers {
                                     if ((x == 0 && !cellField[x][y].piece.isBlack) || (x == 7 && cellField[x][y].piece.isBlack)) {
                                         cellField[x][y].piece.promote();
                                     }
-
                                     break;
                             }
                         }
@@ -122,6 +150,8 @@ public class EksuelCheckers {
                     }
 
                     // klikáme na věc poprvé, nic zatim neni selected
+                    // TODO: fix movement
+
                     else {
                         System.out.println("Nothing selected yet");
 
@@ -249,6 +279,23 @@ public class EksuelCheckers {
                 }
             }
         }
+
+        if (e.getSource() == playAgain) {
+            for (int x = 0; x < cellField.length; x++) {
+                for (int y = 0; y < cellField[x].length; y++) {
+                    buttonField[x][y].setVisible(true);
+                }
+            }
+            turnDisplay.setVisible(true);
+            playAgain.setVisible(false);
+            quit.setVisible(false);
+            blackWon.setVisible(false);
+            whiteWon.setVisible(false);
+            initializeCells();
+            render();
+        } else if (e.getSource() == quit) {
+            System.exit(0);
+        } else whoWon();
     }
 
     public void deselectAll() {
@@ -266,6 +313,45 @@ public class EksuelCheckers {
 
     public void deselect(int x, int y) {
         this.cellField[x][y].isSelected = false;
+    }
+
+    public void whoWon() {
+        boolean isItBlack = true;
+        boolean isItWhite = true;
+        for (int x = 0; x < cellField.length; x++) {
+            for (int y = 0; y < cellField[x].length; y++) {
+                if (!isNull(cellField[x][y].piece)) {
+                    if (cellField[x][y].piece.isBlack) {
+                        isItWhite = false;
+                    } else {
+                        isItBlack = false;
+                    }
+                }
+            }
+        }
+        if (isItBlack && isItWhite) {
+            System.out.println(Mik.BG_YELLOW + Mik.BLACK + "WARN:" + Mik.RESET + Mik.YELLOW + " Vyhráli oba zároveň!" + Mik.RESET);
+        }
+
+
+        if (isItBlack || isItWhite) {
+            System.out.println("Somebody won!");
+            for (int x = 0; x < cellField.length; x++) {
+                for (int y = 0; y < cellField[x].length; y++) {
+                    buttonField[x][y].setVisible(false);
+                }
+            }
+            turnDisplay.setVisible(false);
+            playAgain.setVisible(true);
+            quit.setVisible(true);
+
+            if (isItBlack) {
+                blackWon.setVisible(true);
+            } else if (isItWhite) {
+                whiteWon.setVisible(true);
+            }
+        } else
+            System.out.println("Nobody won!");
     }
 
 
@@ -323,7 +409,12 @@ public class EksuelCheckers {
                     }
                 }
             }
-            System.out.println("");
+            System.out.println();
+        }
+        if (isBlacksTurn) {
+            turnDisplay.setText("It should be black's turn");
+        } else {
+            turnDisplay.setText("It should be white's turn");
         }
 
         System.out.println("Done!");
