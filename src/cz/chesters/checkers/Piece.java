@@ -1,7 +1,7 @@
 package cz.chesters.checkers;
 
 public class Piece {
-    boolean isBlack;
+    final boolean isBlack;
     boolean isDama;
 
     public Piece(boolean isBlack) {

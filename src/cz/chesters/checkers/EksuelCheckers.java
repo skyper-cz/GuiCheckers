@@ -3,10 +3,10 @@ package cz.chesters.checkers;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
 
 import static java.util.Objects.isNull;
 
+@SuppressWarnings("CanBeFinal")
 public class EksuelCheckers {
     JFrame frame = new JFrame("Checkers");
     Cell[][] cellField = new Cell[8][8];
@@ -83,7 +83,7 @@ public class EksuelCheckers {
 
     public void initializeCells() {
         System.out.println("Initializing cells...");
-        int x = 0;
+        @SuppressWarnings("UnusedAssignment") int x = 0;
         int y = 0;
 
         // Lord, have mercy.
@@ -168,38 +168,36 @@ public class EksuelCheckers {
                                 // všechny tily a bude jim přiřazenej příslušnej SelectReason
                                 for (int yPol = -1; yPol < 2; yPol = yPol + 2) {
                                     for (int xPol = -1; xPol < 2; xPol = xPol + 2) {
-                                        repetition:
                                         for (int i = 1; i < 8; i++) {
                                             if ((x + i * xPol) > 7 || (x + i * xPol) < 0 || (y + i * yPol) > 7 || (y + i * yPol) < 0) {
                                                 System.out.println("that would've been out of bounds!");
-                                                break repetition;
+                                                break;
                                             } else if (isNull(cellField[x + i * xPol][y + i * yPol].piece)) {
                                                 // nic tam neni
                                                 System.out.println("we can move there");
                                                 cellField[x + i * xPol][y + i * yPol].select(true, Cell.Reason.MOVE);
-                                                continue repetition;
-                                            } else if (cellField[x + i * xPol][y + i * yPol].piece.isBlack == cellField[x][y].piece.isBlack){
+                                            } else if (cellField[x + i * xPol][y + i * yPol].piece.isBlack == cellField[x][y].piece.isBlack) {
                                                 // jsme si jistý, že to první neni null a to druhý by měla bejt ta figurka na kterou se kliklo
                                                 // je to jiná naše figurka, nedá se nic.
                                                 System.out.println("that is a friend");
-                                                break repetition;
-                                            } else if (cellField[x + i * xPol][y + i * yPol].piece.isBlack != cellField[x][y].piece.isBlack){
+                                                break;
+                                            } else if (cellField[x + i * xPol][y + i * yPol].piece.isBlack != cellField[x][y].piece.isBlack) {
                                                 // jsme si jistý, že to první neni null a to druhý by měla bejt ta figurka na kterou se kliklo
                                                 // je to cizí figurka, jdem zkusit, jestli jde přeskočit
                                                 System.out.println("that is a foe");
-                                                if ((x + (i+1) * xPol) > 7 || (x + (i+1) * xPol) < 0 || (y + (i+1) * yPol) > 7 || (y + (i+1) * yPol) < 0){
+                                                if ((x + (i + 1) * xPol) > 7 || (x + (i + 1) * xPol) < 0 || (y + (i + 1) * yPol) > 7 || (y + (i + 1) * yPol) < 0) {
                                                     // nende to, ta figurka stojí u kraje
                                                     System.out.println("can't jump - enemy too close to border");
-                                                    break repetition;
-                                                } else if (isNull(cellField[x + (i+1) * xPol][y + (i+1) * yPol].piece)){
+                                                    break;
+                                                } else if (isNull(cellField[x + (i + 1) * xPol][y + (i + 1) * yPol].piece)) {
                                                     // tam, kam chceme skákat nic neni
                                                     System.out.println("can jump");
-                                                    cellField[x + (i+1) * xPol][y + (i+1) * yPol].select(true, Cell.Reason.JUMP);
-                                                    break repetition;
+                                                    cellField[x + (i + 1) * xPol][y + (i + 1) * yPol].select(true, Cell.Reason.JUMP);
+                                                    break;
                                                 } else {
                                                     // tam, kam chceme skákat už je nějaká figurka
                                                     System.out.println("can't jump - landing space is occupied");
-                                                    break repetition;
+                                                    break;
                                                 }
                                             }
                                         }
@@ -320,9 +318,9 @@ public class EksuelCheckers {
     }
 
     public void deselectAll() {
-        for (int x = 0; x < cellField.length; x++) {
-            for (int y = 0; y < cellField[x].length; y++) {
-                cellField[x][y].isSelected = false;
+        for (Cell[] cells : cellField) {
+            for (Cell cell : cells) {
+                cell.isSelected = false;
             }
         }
     }
@@ -339,10 +337,10 @@ public class EksuelCheckers {
     public void whoWon() {
         boolean isItBlack = true;
         boolean isItWhite = true;
-        for (int x = 0; x < cellField.length; x++) {
-            for (int y = 0; y < cellField[x].length; y++) {
-                if (!isNull(cellField[x][y].piece)) {
-                    if (cellField[x][y].piece.isBlack) {
+        for (Cell[] cells : cellField) {
+            for (Cell cell : cells) {
+                if (!isNull(cell.piece)) {
+                    if (cell.piece.isBlack) {
                         isItWhite = false;
                     } else {
                         isItBlack = false;
@@ -368,7 +366,7 @@ public class EksuelCheckers {
 
             if (isItBlack) {
                 blackWon.setVisible(true);
-            } else if (isItWhite) {
+            } else {
                 whiteWon.setVisible(true);
             }
         } else

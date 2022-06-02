@@ -1,13 +1,7 @@
 package cz.chesters.checkers;
 
-import cz.chesters.checkers.buttonVec.ButtonVec;
-import cz.chesters.checkers.cringe.Calculator;
-import cz.chesters.checkers.cringe.PlusMinusVec;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.Locale;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {

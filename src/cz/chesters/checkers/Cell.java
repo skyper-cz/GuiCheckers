@@ -1,11 +1,9 @@
 package cz.chesters.checkers;
 
-import javax.swing.*;
-
 import static java.util.Objects.isNull;
 
 public class Cell {
-    boolean isBlack;
+    final boolean isBlack;
     Piece piece;
     boolean isSelected;
     Reason selectReason;
