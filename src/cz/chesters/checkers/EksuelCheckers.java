@@ -3,6 +3,7 @@ package cz.chesters.checkers;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
 import static java.util.Objects.isNull;
 
@@ -167,20 +168,40 @@ public class EksuelCheckers {
                                 // všechny tily a bude jim přiřazenej příslušnej SelectReason
                                 for (int yPol = -1; yPol < 2; yPol = yPol + 2) {
                                     for (int xPol = -1; xPol < 2; xPol = xPol + 2) {
-                                        try {
-                                            for (int i = 1; i < 8; i++) {
-                                                if (isNull(cellField[y + i * yPol][x + i * xPol].piece)) {
-                                                    cellField[y + i * yPol][x + i * xPol].select(true, Cell.Reason.MOVE);
-                                                } else if (cellField[y + i * yPol][x + i * xPol].piece.isBlack != cellField[y][x].piece.isBlack) {
-                                                    if (isNull(cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].piece)) {
-                                                        this.cellField[y + (i + 1) * yPol][x + (i + 1) * xPol].select(true, Cell.Reason.JUMP);
-                                                        break;
-                                                    }
+                                        repetition:
+                                        for (int i = 1; i < 8; i++) {
+                                            if ((x + i * xPol) > 7 || (x + i * xPol) < 0 || (y + i * yPol) > 7 || (y + i * yPol) < 0) {
+                                                System.out.println("that would've been out of bounds!");
+                                                break repetition;
+                                            } else if (isNull(cellField[x + i * xPol][y + i * yPol].piece)) {
+                                                // nic tam neni
+                                                System.out.println("we can move there");
+                                                cellField[x + i * xPol][y + i * yPol].select(true, Cell.Reason.MOVE);
+                                                continue repetition;
+                                            } else if (cellField[x + i * xPol][y + i * yPol].piece.isBlack == cellField[x][y].piece.isBlack){
+                                                // jsme si jistý, že to první neni null a to druhý by měla bejt ta figurka na kterou se kliklo
+                                                // je to jiná naše figurka, nedá se nic.
+                                                System.out.println("that is a friend");
+                                                break repetition;
+                                            } else if (cellField[x + i * xPol][y + i * yPol].piece.isBlack != cellField[x][y].piece.isBlack){
+                                                // jsme si jistý, že to první neni null a to druhý by měla bejt ta figurka na kterou se kliklo
+                                                // je to cizí figurka, jdem zkusit, jestli jde přeskočit
+                                                System.out.println("that is a foe");
+                                                if ((x + (i+1) * xPol) > 7 || (x + (i+1) * xPol) < 0 || (y + (i+1) * yPol) > 7 || (y + (i+1) * yPol) < 0){
+                                                    // nende to, ta figurka stojí u kraje
+                                                    System.out.println("can't jump - enemy too close to border");
+                                                    break repetition;
+                                                } else if (isNull(cellField[x + (i+1) * xPol][y + (i+1) * yPol].piece)){
+                                                    // tam, kam chceme skákat nic neni
+                                                    System.out.println("can jump");
+                                                    cellField[x + (i+1) * xPol][y + (i+1) * yPol].select(true, Cell.Reason.JUMP);
+                                                    break repetition;
                                                 } else {
-                                                    break;
+                                                    // tam, kam chceme skákat už je nějaká figurka
+                                                    System.out.println("can't jump - landing space is occupied");
+                                                    break repetition;
                                                 }
                                             }
-                                        } catch (Exception ignored) {
                                         }
                                     }
                                 }
@@ -191,7 +212,7 @@ public class EksuelCheckers {
 
                                     try {
                                         if (!isNull(cellField[x + 1][y - 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y - 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y - 1].piece.isBlack && isNull(cellField[x + 2][y - 2].piece)) {
                                                 cellField[x + 2][y - 2].select(true, Cell.Reason.JUMP);
                                             }
                                         } else cellField[x + 1][y - 1].select(true, Cell.Reason.MOVE);
@@ -200,7 +221,7 @@ public class EksuelCheckers {
 
                                     try {
                                         if (!isNull(cellField[x - 1][y - 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y - 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y - 1].piece.isBlack && isNull(cellField[x - 2][y - 2].piece)) {
                                                 cellField[x - 2][y - 2].select(true, Cell.Reason.JUMP);
                                             }
                                         }
@@ -210,7 +231,7 @@ public class EksuelCheckers {
                                     try {
 
                                         if (!isNull(cellField[x + 1][y + 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y + 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y + 1].piece.isBlack && isNull(cellField[x + 2][y + 2].piece)) {
                                                 cellField[x + 2][y + 2].select(true, Cell.Reason.JUMP);
                                             }
                                         } else cellField[x + 1][y + 1].select(true, Cell.Reason.MOVE);
@@ -219,7 +240,7 @@ public class EksuelCheckers {
 
                                     try {
                                         if (!isNull(cellField[x - 1][y + 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y + 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y + 1].piece.isBlack && isNull(cellField[x - 2][y + 2].piece)) {
                                                 cellField[x - 2][y + 2].select(true, Cell.Reason.JUMP);
                                             }
                                         }
@@ -233,7 +254,7 @@ public class EksuelCheckers {
                                     System.out.println("Clicked piece is white");
                                     try {
                                         if (!isNull(cellField[x + 1][y - 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y - 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y - 1].piece.isBlack && isNull(cellField[x + 2][y - 2].piece)) {
                                                 cellField[x + 2][y - 2].select(true, Cell.Reason.JUMP);
                                             }
                                         }
@@ -242,7 +263,7 @@ public class EksuelCheckers {
 
                                     try {
                                         if (!isNull(cellField[x - 1][y - 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y - 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y - 1].piece.isBlack && isNull(cellField[x - 2][y - 2].piece)) {
                                                 cellField[x - 2][y - 2].select(true, Cell.Reason.JUMP);
                                             }
                                         } else cellField[x - 1][y - 1].select(true, Cell.Reason.MOVE);
@@ -251,7 +272,7 @@ public class EksuelCheckers {
 
                                     try {
                                         if (!isNull(cellField[x + 1][y + 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y + 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x + 1][y + 1].piece.isBlack && isNull(cellField[x + 2][y + 2].piece)) {
                                                 cellField[x + 2][y + 2].select(true, Cell.Reason.JUMP);
                                             }
                                         }
@@ -260,7 +281,7 @@ public class EksuelCheckers {
 
                                     try {
                                         if (!isNull(cellField[x - 1][y + 1].piece)) {
-                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y + 1].piece.isBlack) {
+                                            if (cellField[x][y].piece.isBlack != cellField[x - 1][y + 1].piece.isBlack && isNull(cellField[x - 2][y + 2].piece)) {
                                                 cellField[x - 2][y + 2].select(true, Cell.Reason.JUMP);
                                             }
                                         } else cellField[x - 1][y + 1].select(true, Cell.Reason.MOVE);
@@ -356,60 +377,60 @@ public class EksuelCheckers {
 
 
     public void render() {
-        System.out.println("Rendering...");
+        //System.out.println("Rendering...");
 
         for (int x = 0; x < cellField.length; x++) {
             for (int y = 0; y < cellField[x].length; y++) {
                 if (!cellField[x][y].isBlack) {
                     buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white.png"));
-                    System.out.print("WWW ");
+                    //System.out.print("WWW ");
                 } else if (isNull(cellField[x][y].piece)) {
                     if (cellField[x][y].isSelected) {
                         buttonField[x][y].setIcon(new ImageIcon("resources/checkers/blank highlighted.png"));
-                        System.out.print("XXH ");
+                        //System.out.print("XXH ");
                     } else {
                         buttonField[x][y].setIcon(new ImageIcon("resources/checkers/blank.png"));
-                        System.out.print("XXX ");
+                        //System.out.print("XXX ");
                     }
                 } else if (cellField[x][y].piece.isBlack) {
                     if (cellField[x][y].piece.isDama) {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black double checker highlighted.png"));
-                            System.out.print("BDH ");
+                            //System.out.print("BDH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black double checker.png"));
-                            System.out.print("BDX ");
+                            //System.out.print("BDX ");
                         }
                     } else {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black checker highlighted.png"));
-                            System.out.print("BCH ");
+                            //System.out.print("BCH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/black checker.png"));
-                            System.out.print("BCX ");
+                            //System.out.print("BCX ");
                         }
                     }
                 } else {
                     if (cellField[x][y].piece.isDama) {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white double checker highlighted.png"));
-                            System.out.print("WDH ");
+                            //System.out.print("WDH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white double checker.png"));
-                            System.out.print("WDX ");
+                            //System.out.print("WDX ");
                         }
                     } else {
                         if (cellField[x][y].isSelected) {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white checker highlighted.png"));
-                            System.out.print("WCH ");
+                            //System.out.print("WCH ");
                         } else {
                             buttonField[x][y].setIcon(new ImageIcon("resources/checkers/white checker.png"));
-                            System.out.print("WCX ");
+                            //System.out.print("WCX ");
                         }
                     }
                 }
             }
-            System.out.println();
+            //System.out.println();
         }
         if (isBlacksTurn) {
             turnDisplay.setText("It should be black's turn");
@@ -417,6 +438,6 @@ public class EksuelCheckers {
             turnDisplay.setText("It should be white's turn");
         }
 
-        System.out.println("Done!");
+        //System.out.println("Done!");
     }
 }
